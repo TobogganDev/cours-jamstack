@@ -9,7 +9,7 @@
     <template v-else>
       <div class="w-1/3 flex flex-col gap-4 py-4 mx-2">
         <h3>events</h3>
-        <button v-for="type in types" :key="type.type" :class="filters.includes(type.name) ? 'bg-gray-900' : 'bg-white'" class="text-black" @click="addFilter(type.type)">
+        <button v-for="type in types" :key="type.type" :class="filters.includes(type.type) ? 'bg-gray-900' : 'bg-white'" class="text-black" @click="addFilter(type.type)">
           {{type.type}}
         </button>
         <button @click="reset()">reset</button>
@@ -26,25 +26,45 @@
         </div>
       </div>
     </template>
+    <UPagination
+        v-if="events?.meta"
+        v-model="page"
+        :page-count="events.meta.pagination.pageCount"
+        :total="events?.meta.pagination.total"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 
 import type {EventsResponse} from "~/models/event.model";
-import type {ArtistsResponse} from "~/models/artist.model";
 import type {Type} from "~/models/type.model";
 
 const { find } = useStrapi()
 
 const filters = ref<String[]>([])
 const searchQuery = ref('')
+const page = ref(1)
+const pageSize = ref(3)
 
-const { data: events, pending: eventsPending } = await useAsyncData('events', async () => {
-  return await find<EventsResponse>('events', {
-    populate: '*',
-  }).then(res => res.data);
-});
+const { data: events, pending: eventsPending, error: eventError, refresh: eventRefresh } = useAsyncData('events', () =>
+        find<EventsResponse>('events', {
+          populate: '*',
+          pagination: {
+            page: page.value,
+            pageSize: pageSize.value
+          },
+          filters: {
+            types: {
+              type: {
+                $in: filters.value
+              }
+            }
+          }
+        }), {
+      watch: [page, filters],
+    }
+);
 
 const { data: types, pending: typePending } = await useAsyncData('types', async () => {
   return await find<Type>('types', {
@@ -58,6 +78,8 @@ const addFilter = (filter: string) => {
   } else {
     filters.value = filters.value.filter((f) => f !== filter)
   }
+
+  eventRefresh()
 }
 
 function reset() {
@@ -65,7 +87,7 @@ function reset() {
 }
 
 const filteredEvents = computed(() => {
-  let eventFiltered = events.value
+  let eventFiltered = events.value.data
 
   if (filters.value.length) {
     eventFiltered = eventFiltered.filter((event) => {
