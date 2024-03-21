@@ -1,5 +1,5 @@
-import type {Image, Meta} from "~/models/strapi.model";
-import type {Event} from "~/models/event.model"
+import type {Image, Meta} from "./strapi.model";
+import type {Event} from "./event.model"
 
 export interface Artist {
     id: number

@@ -4,7 +4,7 @@
   "info": {
     "singularName": "event",
     "pluralName": "events",
-    "displayName": "event",
+    "displayName": "Event",
     "description": ""
   },
   "options": {
@@ -18,7 +18,7 @@
     },
     "cover": {
       "type": "media",
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "allowedTypes": [
         "images"
@@ -37,6 +37,12 @@
     "slug": {
       "type": "uid",
       "targetField": "name"
+    },
+    "types": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::type.type",
+      "mappedBy": "events"
     }
   }
 }

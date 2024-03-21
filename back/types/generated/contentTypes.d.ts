@@ -829,7 +829,7 @@ export interface ApiEventEvent extends Schema.CollectionType {
   info: {
     singularName: 'event';
     pluralName: 'events';
-    displayName: 'event';
+    displayName: 'Event';
     description: '';
   };
   options: {
@@ -845,6 +845,11 @@ export interface ApiEventEvent extends Schema.CollectionType {
       'api::artist.artist'
     >;
     slug: Attribute.UID<'api::event.event', 'name'>;
+    types: Attribute.Relation<
+      'api::event.event',
+      'manyToMany',
+      'api::type.type'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -859,6 +864,34 @@ export interface ApiEventEvent extends Schema.CollectionType {
       'oneToOne',
       'admin::user'
     > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiTypeType extends Schema.CollectionType {
+  collectionName: 'types';
+  info: {
+    singularName: 'type';
+    pluralName: 'types';
+    displayName: 'Type';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    type: Attribute.String;
+    events: Attribute.Relation<
+      'api::type.type',
+      'manyToMany',
+      'api::event.event'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::type.type', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::type.type', 'oneToOne', 'admin::user'> &
       Attribute.Private;
   };
 }
@@ -883,6 +916,7 @@ declare module '@strapi/types' {
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'api::artist.artist': ApiArtistArtist;
       'api::event.event': ApiEventEvent;
+      'api::type.type': ApiTypeType;
     }
   }
 }

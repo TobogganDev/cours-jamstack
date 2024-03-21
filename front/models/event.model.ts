@@ -1,5 +1,6 @@
-import type {Artist} from "~/models/artist.model";
-import type {Meta} from "~/models/strapi.model";
+import type {Artist} from './artist.model';
+import type {Meta} from "./strapi.model";
+import type {Type} from "./type.model";
 
 export interface Event {
     id: number
@@ -7,6 +8,7 @@ export interface Event {
     slug: string
     date: Date
     artists: Artist[]
+    types: Type[]
 }
 
 export interface EventResponse {
