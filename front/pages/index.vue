@@ -1,5 +1,8 @@
 <template>
-  <div class="flex gap-4">
+  <div class="flex flex-col gap-12">
+    <div>
+      <input type="text" v-model="searchQuery" name="search" id="search">
+    </div>
     <template v-if="typePending">
       <span>filters charge</span>
     </template>
@@ -9,6 +12,7 @@
         <button v-for="type in types" :key="type.type" :class="filters.includes(type.name) ? 'bg-gray-900' : 'bg-white'" class="text-black" @click="addFilter(type.type)">
           {{type.type}}
         </button>
+        <button @click="reset()">reset</button>
       </div>
     </template>
 
@@ -34,6 +38,7 @@ import type {Type} from "~/models/type.model";
 const { find } = useStrapi()
 
 const filters = ref<String[]>([])
+const searchQuery = ref('')
 
 const { data: events, pending: eventsPending } = await useAsyncData('events', async () => {
   return await find<EventsResponse>('events', {
@@ -55,15 +60,30 @@ const addFilter = (filter: string) => {
   }
 }
 
+function reset() {
+  filters.value = []
+}
+
 const filteredEvents = computed(() => {
-  if (!filters.value.length) {
-    return events?.value
+  let eventFiltered = events.value
+
+  if (filters.value.length) {
+    eventFiltered = eventFiltered.filter((event) => {
+      return event?.types?.some((type) => filters.value.includes(type.type))
+    })
   }
 
-  return events?.value.filter((event) => {
-    return event?.types?.some((type) => filters.value.includes(type.type))
-  })
+  if (searchQuery.value) {
+    const lowSearchQuery = searchQuery.value.toLowerCase()
+    eventFiltered = eventFiltered.filter((event) => {
+      return event.name.toLowerCase().includes(lowSearchQuery)
+    })
+  }
+  return eventFiltered
 })
+
+
+
 </script>
 
 <style lang="scss" scoped>
