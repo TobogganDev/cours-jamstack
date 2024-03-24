@@ -1,37 +1,57 @@
 <template>
-  <div class="flex flex-col gap-12">
-    <div>
-      <input type="text" v-model="searchQuery" name="search" id="search">
+  <div class="flex flex-col gap-12 m-12">
+    <div class="w-full">
+      <input type="text" v-model="searchQuery" placeholder="Search Event" name="search" id="search" class="w-full rounded-full px-8 py-4">
     </div>
     <template v-if="typePending">
-      <span>filters charge</span>
+      <span>Loading filters</span>
     </template>
     <template v-else>
-      <div class="w-1/3 flex flex-col gap-4 py-4 mx-2">
-        <h3>events</h3>
-        <button v-for="type in types" :key="type.type" :class="filters.includes(type.type) ? 'bg-gray-900' : 'bg-white'" class="text-black" @click="addFilter(type.type)">
+      <div class="flex flex-col md:flex-row gap-4 py-4 mx-2 w-fit md:items-center">
+        <button
+            v-for="type in types"
+            :key="type.type"
+            :class="filters.includes(type.type) ? 'bg-[#4ADE80]' : 'bg-transparent'"
+            class="px-4 py-2 rounded-full capitalize border-white/15 border transition-all"
+            @click="addFilter(type.type)"
+        >
           {{type.type}}
         </button>
-        <button @click="reset()">reset</button>
+        <button
+            @click="reset()"
+            class="flex capitalize text-white/25 px-4 py-2 rounded-full border-white/15 border"
+        >
+          X reset
+        </button>
       </div>
     </template>
 
     <template v-if="eventsPending">
-      <span>artist charge</span>
+      <span>Loading Events</span>
     </template>
     <template v-else>
-      <div class="w-2/3 flex flex-col items-center justify-center">
-        <div class="grid grid-cols-2 gap-4 w-full">
-          <p v-for="event in filteredEvents" :key="event.id">{{ event.name }}</p>
-        </div>
+      <div class="flex flex-col gap-4 w-full">
+        <nuxt-link
+            v-for="event in filteredEvents"
+            :key="event.slug"
+            :to="'/events/' + event.slug"
+            class="border-b border-white/15 py-4 px-4 flex justify-between items-center transition-all hover:bg-[#4ADE80]"
+        >
+          <img :src="event.cover.url" alt="" class="w-1/6">
+          <p>{{event.name}}</p>
+          <p class="opacity-25">{{event.date}}</p>
+
+        </nuxt-link>
       </div>
     </template>
-    <UPagination
-        v-if="events?.meta"
-        v-model="page"
-        :page-count="events.meta.pagination.pageCount"
-        :total="events?.meta.pagination.total"
-    />
+    <div class="w-full justify-center flex">
+      <UPagination
+          v-if="events?.meta"
+          v-model="page"
+          :page-count="events.meta.pagination.pageCount"
+          :total="events?.meta.pagination.total"
+      />
+    </div>
   </div>
 </template>
 

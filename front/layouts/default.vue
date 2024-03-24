@@ -1,18 +1,13 @@
 <template>
-  <main role="main">
-    <div class="py-4 px-12 border-b border-white flex gap-4">
-      <nuxt-link to="/">Home</nuxt-link>
-
-    </div>
+  <main role="main" class="bg-[#1D1D1D] h-screen w-full">
+    <TheHeader/>
     <slot/>
-
-    <footer>
-    </footer>
   </main>
 </template>
 
 <script setup lang="ts">
 
+import TheHeader from "~/components/layouts/TheHeader.vue";
 </script>
 
 <style lang="scss" scoped>
